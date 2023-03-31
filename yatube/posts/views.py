@@ -37,13 +37,14 @@ def profile(request, username):
         'author': author,
         'page_obj': page_obj,
     }
-    if request.user.is_authenticated:
-        if Post.objects.filter(author__following__user=request.user).exists():
-            following = True
-            context['following'] = following
-        else:
-            following = False
-            context['following'] = following
+    if request.user.is_authenticated and Follow.objects.filter(
+        author=author,
+        user=request.user
+    ).exists():
+        following = True
+    else:
+        following = False
+    context['following'] = following
     return render(request, 'posts/profile.html', context)
 
 
@@ -108,38 +109,23 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    if request.user.is_authenticated:
-        posts = Post.objects.filter(author__following__user=request.user)
-        page_obj = get_page(request, posts)
-        context = {
-            'posts': posts,
-            'page_obj': page_obj,
-        }
-        return render(request, 'posts/follow.html', context)
-    return render(request, 'posts/follow.html')
+    posts = Post.objects.filter(author__following__user=request.user)
+    page_obj = get_page(request, posts)
+    context = {
+        'page_obj': page_obj,
+    }
+    return render(request, 'posts/follow.html', context)
 
 
 @login_required
 def profile_follow(request, username):
-    if request.user.is_authenticated:
-        author = User.objects.get(username=username)
-        if (
-            Follow.objects.filter(author=author, user=request.user).exists()
-            or request.user == author
-        ):
-            return redirect('posts:profile', username=username)
-        if request.method == 'GET':
-            Follow.objects.create(user=request.user, author=author)
-            return redirect('posts:profile', username)
+    author = get_object_or_404(User, username=username)
+    Follow.objects.get_or_create(user=request.user, author=author)
     return redirect('posts:profile', username)
 
 
 @login_required
 def profile_unfollow(request, username):
-    if request.user.is_authenticated:
-        author = User.objects.get(username=username)
-        if request.method == 'GET':
-            following = Follow.objects.filter(user=request.user, author=author)
-            following.delete()
-            return redirect('posts:profile', username)
+    author = get_object_or_404(User, username=username)
+    Follow.objects.filter(user=request.user, author=author).delete()
     return redirect('posts:profile', username)

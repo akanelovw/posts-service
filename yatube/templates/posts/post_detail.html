@@ -42,7 +42,6 @@
           редактировать запись
         </a> 
       {% endif %}
-    </article>
     {% if user.is_authenticated %}
     <div class="card my-4">
       <h5 class="card-header">Добавить комментарий:</h5>
@@ -70,6 +69,7 @@
           </p>
         </div>
       </div>
+    </article>
     {% endfor %} 
   </div> 
 {% endblock %}

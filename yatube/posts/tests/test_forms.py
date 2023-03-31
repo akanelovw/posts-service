@@ -64,9 +64,9 @@ class PostCreateFormTests(TestCase):
         ))
         self.assertEqual(Post.objects.count(), posts_count + 1)
         latest_post = Post.objects.latest('pub_date')
-        self.assertEqual(latest_post.text, 'Тестовый пост')
-        self.assertEqual(latest_post.group.id, self.group.id)
-        self.assertEqual(latest_post.image, 'posts/small.gif')
+        self.assertEqual(latest_post.text, form_data['text'])
+        self.assertEqual(latest_post.group.id, form_data['group'])
+        self.assertEqual(latest_post.image, f"posts/{form_data['image']}")
 
     def test_post_changes(self):
         post = Post.objects.create(
@@ -74,10 +74,16 @@ class PostCreateFormTests(TestCase):
             text='Тестовый пост',
             group=self.group
         )
+        uploaded = SimpleUploadedFile(
+            name='small2.gif',
+            content=self.small_gif,
+            content_type='image/gif'
+        )
         posts_count = Post.objects.count()
         form_data = {
             'text': 'Тестовый пост111',
             'group': self.group.id,
+            'image': uploaded,
         }
         response = self.authorized_client.post(
             reverse('posts:post_edit', kwargs={'post_id': post.id}),
@@ -89,11 +95,9 @@ class PostCreateFormTests(TestCase):
         ))
         self.assertEqual(Post.objects.count(), posts_count)
         latest_post = Post.objects.latest('pub_date')
-        data = {
-            'text': latest_post.text,
-            'group': latest_post.group.id
-        }
-        self.assertEqual(data, form_data)
+        self.assertEqual(latest_post.text, form_data['text'])
+        self.assertEqual(latest_post.group.id, form_data['group'])
+        self.assertEqual(latest_post.image.name, f"posts/{form_data['image']}")
 
 
 class CommentsFormTests(TestCase):
@@ -101,6 +105,7 @@ class CommentsFormTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='TestUser')
+        cls.comment_author = User.objects.create_user(username='Test')
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый пост',
@@ -109,7 +114,7 @@ class CommentsFormTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
+        self.authorized_client.force_login(self.comment_author)
 
     def test_comments_only_for_auth(self):
         comments_count = self.post.comments.count()
@@ -125,11 +130,9 @@ class CommentsFormTests(TestCase):
             'posts:post_detail', kwargs={'post_id': self.post.id}
         ))
         latest_comment = self.post.comments.latest('pub_date')
-        data = {
-            'text': latest_comment.text,
-        }
-
-        self.assertEqual(data, form_data)
+        self.assertEqual(latest_comment.text, form_data['text'])
+        self.assertEqual(latest_comment.author, self.comment_author)
+        self.assertEqual(latest_comment.post.id, self.post.id)
         response = self.guest_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
             data=form_data,

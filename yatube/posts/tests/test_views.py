@@ -255,27 +255,31 @@ class FollowingTests(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_authorized_user_follow(self):
+        count = Follow.objects.count()
         test_user = User.objects.create_user(username='test')
         response = self.authorized_client.get(
             reverse('posts:profile_follow', args=(test_user.username,)),
             follow=True
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Follow.objects.count(), 1)
-        follow = Follow.objects.first()
+        self.assertEqual(Follow.objects.count(), count + 1)
+        follow = Follow.objects.last()
         self.assertEqual(follow.user, self.user)
         self.assertEqual(follow.author, test_user)
 
     def test_authorized_user_unfollow(self):
         test_user = User.objects.create_user(username='test')
+        self.authorized_client.get(
+            reverse('posts:profile_follow', args=(test_user.username,)),
+            follow=True
+        )
+        count = Follow.objects.count()
         response = self.authorized_client.get(
             reverse('posts:profile_unfollow', args=(test_user.username,)),
             follow=True
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Follow.objects.count(), 0)
-        follow = Follow.objects.first()
-        self.assertEqual(follow, None)
+        self.assertEqual(Follow.objects.count(), count - 1)
 
     def test_follow(self):
         response = self.authorized_client.get(reverse(
