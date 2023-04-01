@@ -33,18 +33,17 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = author.posts.all()
     page_obj = get_page(request, posts)
-    context = {
-        'author': author,
-        'page_obj': page_obj,
-    }
+    following = False
     if request.user.is_authenticated and Follow.objects.filter(
         author=author,
         user=request.user
     ).exists():
         following = True
-    else:
-        following = False
-    context['following'] = following
+    context = {
+        'author': author,
+        'page_obj': page_obj,
+        'following': following,
+    }
     return render(request, 'posts/profile.html', context)
 
 
@@ -125,9 +124,8 @@ def profile_follow(request, username):
         or request.user == author
     ):
         return redirect('posts:profile', username=username)
-    if request.method == 'GET':
-        Follow.objects.create(user=request.user, author=author)
-        return redirect('posts:profile', username)
+    Follow.objects.create(user=request.user, author=author)
+    return redirect('posts:profile', username)
 
 
 @login_required
