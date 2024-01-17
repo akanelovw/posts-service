@@ -1,8 +1,9 @@
-# Описание проекта Posts Service
+# Проект Posts Service
 Сервис для публикации отзывов, с комментариями и подписками на авторов.
 
 ## Стек использованных технологий
-- Django
+- Python 3.9
+- Django 2.2.16
 - Unittest
 - PostgreSQL
 - Django ORM
