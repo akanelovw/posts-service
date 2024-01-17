@@ -1,3 +1,39 @@
-# hw05_final
+# Сервис для публикации отзывов, с комментариями и подписками на авторов.
 
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+## Стек использованных технологий
+Django
+Unittest
+PostgreSQL
+Django ORM
+
+## Запуск проекта
+Клонировать репозиторий:
+```bash
+<git clone https://github.com/DevCatRain/hw05_final.git>
+```
+
+Перейти в клонированный репозиторий:
+```bash    
+<cd api_yamdb>
+```
+
+Cоздать и активировать виртуальное окружение:
+```bash
+<python -m venv venv>
+<source venv/Scripts/activate>
+```
+
+Установить зависимости из файла requirements.txt:
+```bash
+<pip install -r requirements.txt>
+```
+
+Выполнить миграции:
+```bash
+<python manage.py migrate>
+```
+
+Запустить проект:
+```bash  
+<python manage.py runserver>
+```
