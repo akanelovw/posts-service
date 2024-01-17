@@ -9,31 +9,31 @@ Django ORM
 ## Запуск проекта
 Клонировать репозиторий:
 ```bash
-<git clone https://github.com/DevCatRain/hw05_final.git>
+git@github.com:akanelovw/posts-service.git
 ```
 
 Перейти в клонированный репозиторий:
 ```bash    
-<cd api_yamdb>
+cd api_yamdb
 ```
 
 Cоздать и активировать виртуальное окружение:
 ```bash
-<python -m venv venv>
-<source venv/Scripts/activate>
+python -m venv venv
+source venv/Scripts/activate
 ```
 
 Установить зависимости из файла requirements.txt:
 ```bash
-<pip install -r requirements.txt>
+pip install -r requirements.txt
 ```
 
 Выполнить миграции:
 ```bash
-<python manage.py migrate>
+python manage.py migrate
 ```
 
 Запустить проект:
 ```bash  
-<python manage.py runserver>
+python manage.py runserver
 ```
